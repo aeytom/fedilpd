@@ -3,3 +3,4 @@ fedilpd
 Dockerfile
 k8s/
 microk8s.sh
+vendor/

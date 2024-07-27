@@ -5,3 +5,4 @@ env.yaml
 microk8s.sh
 bdelpd.db-shm
 bdelpd.db-wal
+vendor/
