@@ -132,17 +132,13 @@ func replyNotifications(mc *mastodon.Client, settings *app.Settings) {
 
 			// Respond to different types of notifications with appropriate messages
 			switch n.Type {
-			case "favourite":
-				sendReply(settings, mc, n, "Danke für ⭐")
-				sendReply(settings, mc, n, "Danke für ⭐") // Thank you for the star
+			// case "favourite":
+			// 	sendReply(settings, mc, n, "Danke für ⭐") // Thank you for the star
 			case "follow":
-				sendReply(settings, mc, n, "Vielen Dank für das Interesse. 🤗")
 				sendReply(settings, mc, n, "Vielen Dank für das Interesse. 🤗") // Thank you for your interest
-			case "reblog":
-				sendReply(settings, mc, n, "Vielen Dank für die Unterstützung. 🤗")
-				sendReply(settings, mc, n, "Vielen Dank für die Unterstützung. 🤗") // Thank you for your support
+			// case "reblog":
+			// 	sendReply(settings, mc, n, "Vielen Dank für die Unterstützung. 🤗") // Thank you for your support
 			case "mention":
-				doFavourite(settings, mc, n)
 				doFavourite(settings, mc, n) // Favourite the mention
 			}
 		}
