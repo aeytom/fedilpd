@@ -2,3 +2,6 @@ env.yaml
 *.db
 .vscode/
 /fedilpd
+microk8s.sh
+bdelpd.db-shm
+bdelpd.db-wal

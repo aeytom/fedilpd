@@ -25,9 +25,6 @@ type MastodonConfig struct {
 	// Your access token: Rdn…
 	Token string `yaml:"token,omitempty"`
 	//
-	Email    string `yaml:"email,omitempty"`
-	Password string `yaml:"password,omitempty"`
-	//
 	UserAgent string `yaml:"user_agent,omitempty"`
 }
 
@@ -47,10 +44,6 @@ func (s *Settings) GetClient() *mastodon.Client {
 			AccessToken:  s.Mastodon.Token,
 		},
 		UserAgent: s.Mastodon.UserAgent,
-	}
-	err := c.Authenticate(context.Background(), s.Mastodon.Email, s.Mastodon.Password)
-	if err != nil {
-		s.Fatal(err)
 	}
 	return c
 }

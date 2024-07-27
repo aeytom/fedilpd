@@ -104,6 +104,80 @@ func main() {
 			settings.Log("… sent ", item.Link)
 		}
 	}
+
+	replyNotifications(mc, settings)
+}
+
+func replyNotifications(mc *mastodon.Client, settings *app.Settings) {
+	// Create a new Pagination object to control the number of notifications fetched
+	pg := &mastodon.Pagination{
+		MaxID:   "",
+		SinceID: "",
+		MinID:   "",
+		Limit:   40,
+	}
+	// Fetch notifications using the Mastodon client
+	if nl, err := mc.GetNotifications(context.Background(), pg); err != nil {
+		// Log any errors that occur while fetching notifications
+		settings.Log(err)
+	} else {
+		// Iterate over the fetched notifications
+		for i, n := range nl {
+			// Log the index, notification ID, type, and account name
+			settings.Log(i, " ", n.ID, " ", n.Type, " ", n.Account.Acct)
+			// Skip the notification if it's from a bot account
+			if n.Account.Bot {
+				continue
+			}
+
+			// Respond to different types of notifications with appropriate messages
+			switch n.Type {
+			case "favourite":
+				sendReply(settings, mc, n, "Danke für ⭐")
+				sendReply(settings, mc, n, "Danke für ⭐") // Thank you for the star
+			case "follow":
+				sendReply(settings, mc, n, "Vielen Dank für das Interesse. 🤗")
+				sendReply(settings, mc, n, "Vielen Dank für das Interesse. 🤗") // Thank you for your interest
+			case "reblog":
+				sendReply(settings, mc, n, "Vielen Dank für die Unterstützung. 🤗")
+				sendReply(settings, mc, n, "Vielen Dank für die Unterstützung. 🤗") // Thank you for your support
+			case "mention":
+				doFavourite(settings, mc, n)
+				doFavourite(settings, mc, n) // Favourite the mention
+			}
+		}
+	}
+	// Clear all notifications after processing
+	if err := mc.ClearNotifications(context.Background()); err != nil {
+		// Log any errors that occur while clearing notifications
+		settings.Log(err)
+	}
+}
+func doFavourite(settings *app.Settings, mc *mastodon.Client, note *mastodon.Notification) {
+	settings.Log(note)
+	if s, err := mc.Favourite(context.Background(), note.Status.ID); err != nil {
+		settings.Log("doFavorite ", err)
+	} else {
+		settings.Log("doFavourite ", s.Account)
+	}
+}
+
+func sendReply(settings *app.Settings, mc *mastodon.Client, note *mastodon.Notification, text string) {
+
+	toot := &mastodon.Toot{
+		Status:     "@" + note.Account.Acct + " " + text,
+		Sensitive:  false,
+		Visibility: "direct", // "unlisted"
+		Language:   "de",
+	}
+	if note.Status != nil && note.Status.ID != "" {
+		toot.InReplyToID = note.Status.ID
+	}
+	if _, err := mc.PostStatus(context.Background(), toot); err != nil {
+		settings.Log(err)
+	} else if err = mc.DismissNotification(context.Background(), note.ID); err != nil {
+		settings.Log(err)
+	}
 }
 
 func hashtag(text string) string {

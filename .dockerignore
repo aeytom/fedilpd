@@ -2,3 +2,4 @@ env.yaml
 fedilpd
 Dockerfile
 k8s/
+microk8s.sh
